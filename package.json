@@ -1,0 +1,9 @@
+{
+  "name": "Pure-Utils",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "async": "*",
+    "nodemailer": "^0.7.1"
+  }
+}
