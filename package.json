@@ -6,6 +6,7 @@
     "async": "*",
     "nodemailer": "^0.7.1",
     "sqlite3": "^3.1.8",
-    "mysql": "*"
+    "mysql": "*",
+    "request": "*"
   }
 }
