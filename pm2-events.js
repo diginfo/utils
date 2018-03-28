@@ -7,8 +7,8 @@ var fs = require('fs');
 var asy = require("async");
 var cl = console.log;
 var path = require('path');
-var sqlite3 = require(lpath+'sqlite3');
-var pm2 = require(__dirname+'/pm2-apps.js');
+var sqlite3 = require('sqlite3');
+var pm2 = require('/usr/share/nodejs/pm2/pm2-apps.js');
 
 function exec(cmd,cb){
 	var childProcess = require('child_process');
