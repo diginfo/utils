@@ -111,7 +111,10 @@ function parse(last){
         // query time
         var qt = line.replace('Time: ','').replace('  ',' ').split(' ') // # Time: 180328  9:00:54
         var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
-        var date = new Date(ds);
+        
+        // 8 minute date hack
+        var nd = new Date(ds);
+        var date = new Date(nd.getTime() + 8*60000);
         
         //cl(unique && end && idx != len-8); //515/516
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
