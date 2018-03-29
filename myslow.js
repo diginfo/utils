@@ -93,7 +93,7 @@ function parse(last){
         if(row) {
           
           // new log.
-          if(row.Rows_affected) rows.push(row);
+          //if(row.Rows_affected) rows.push(row);
           
           row.Key = row.Query.join('')
             .replace(/use OMS[^;]+/g,'OMS??')
@@ -105,6 +105,7 @@ function parse(last){
           
           if(!(row.Key in data)) data[row.Key] = [];
           data[row.Key].push(row);
+          rows.push(row);
         }
         
         // query time
