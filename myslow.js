@@ -107,11 +107,9 @@ function parse(last,end){
         var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
         var date = new Date(ds);
         
-        // don't repeat-process the same data
-
         //cl(unique && end && idx != len-8); //515/516
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
-
+        // don't repeat-process the same data
         if(unique && date <= last) row = null;
         else row = {Query:[],Time: date};
       }
@@ -150,7 +148,7 @@ function tail(){
   setInterval(function(){
     var rows = parse(last,true).rows;
     rows.map(function(row){
-      dorow(def,[sdate(row.Time),row.Schema,row.Query_time.toFixed(2),row.Lock_time.toFixed(2),row.Rows_examined,row.Key]);
+      dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
       last = row.Time; 
     })
   },5000)
