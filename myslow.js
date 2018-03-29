@@ -101,7 +101,6 @@ function parse(last){
           
           if(!(row.Key in data)) data[row.Key] = [];
           data[row.Key].push(row);
-          rows.push(row);
         }
         
         // query time
@@ -112,8 +111,11 @@ function parse(last){
         //cl(unique && end && idx != len-8); //515/516
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
         // don't repeat-process the same data
-        if(unique && date < last) row = null;
-        else row = {Query:[],Time: date};
+        if(unique && date <= last) row = null;
+        else {
+          rows.push(row);
+          row = {Query:[],Time: date};
+        }
       }
       
       if(row && line.indexOf('Thread_id:')==0) {
