@@ -145,7 +145,7 @@ function tail(){
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
-      dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
+      dorow(def,[sdate(row.Time),row.Schema,row.Query_time.toFixed(2),row.Lock_time.toFixed(2),row.Rows_examined,row.Key]);
       last = row.Time; 
     })
   },5000)
