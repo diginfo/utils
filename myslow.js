@@ -17,8 +17,8 @@ var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
 // var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
 function dohead(def){var tit=[],ul=[];def.map(function(e){
   tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
-  process.stdout.write(style(tit.join(' '),'fg_blu')+"\n");
-  process.stdout.write(ul.join(' ')+"\n");
+  process.stdout.write(tit.join(' ')+"\n");
+  process.stdout.write(style(ul.join(' '),'fg_blu')+"\n");
 }
 
 function dorow(def,row,sty){var r=[];row.map(function(col,idx){
@@ -152,7 +152,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DB',6],['RUN-SECS',9],['LOCK-SEC',9], ['EXAMINED',9],['SENT',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DB',6],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
