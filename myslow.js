@@ -91,6 +91,10 @@ function parse(last){
       // query strings
       if(line.indexOf('Time:')==0) {
         if(row) {
+          
+          // new log.
+          if(row.Rows_affected) rows.push(row);
+          
           row.Key = row.Query.join('')
             .replace(/use OMS[^;]+/g,'OMS??')
             .replace(/OMS[^;]+;/g,'')
@@ -112,11 +116,8 @@ function parse(last){
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
         // don't repeat-process the same data
         if(unique && date <= last) row = null;
-        else {
-          if(row && row.Time) rows.push(row);
-          row = {Query:[],Time: date};
-        }
-      }
+        else row = {Query:[],Time: date};
+      } // query-strings
       
       if(row && line.indexOf('Thread_id:')==0) {
         var bits = line.replace(/  /g,' ').split(' ');
