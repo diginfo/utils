@@ -74,6 +74,8 @@ function loctime(x){
 }
 
 function parse(last){
+  
+  cl(last);
   var path = "/var/log/mysql/mariadb-slow.log";
   var rows=[], data= {}, row, idx=0;
   var unique = true;
@@ -150,7 +152,6 @@ function tail(){
   
   setInterval(function(){
     var rows = parse(last).rows;
-    cl(rows);
     rows.map(function(row){
       dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
       if(row.Time) last = new Date(row.Time); 
