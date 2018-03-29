@@ -3,6 +3,7 @@
 var readline = require('readline');
 var fs = require('fs');
 var cl = console.log;
+var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
 
 /*
   
@@ -43,7 +44,7 @@ function loctime(x){
 
 function parse(last){
   var path = "/var/log/mysql/mariadb-slow.log";
-  var data = {}, row, idx=0;
+  var rows=[], data= {}, row, idx=0;
   //last = last || new Date(json.last);
   var unique = true;
   fs.readFileSync(path,'utf-8').split(/\n/).map(function(lin){
@@ -66,6 +67,7 @@ function parse(last){
           
           if(!(row.Key in data)) data[row.Key] = [];
           data[row.Key].push(row);
+          rows.push(row);
         }
         
         // query time
@@ -74,7 +76,7 @@ function parse(last){
         var date = new Date(ds);
         
         // don't repeat-process the same data
-        if(unique && date < last) row = null;
+        if(unique && date <= last) row = null;
         else row = {Query:[],Time: date};
       }
       
@@ -98,14 +100,29 @@ function parse(last){
     }
     //cl(row);
   })
+  
+  return {data:data,rows:rows};
+}
+
+
+function tail(){
+  var last = new Date(json.last);
+  setInterval(function(){
+    var rows = parse(last).rows;
+    rows.map(function(row){
+      cl(row);
+      last = row.Time;
+      cl('LAST',last)  
+    })
+  },5000)
 }
 
 function go(){
-  
-  var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
-  
+
   var last = new Date(json.last);
-  var data = parse(last);
+  var data = parse(last).data;
+  
+  
   
   var odata = {
     
@@ -212,7 +229,9 @@ function go(){
   }
 }
 
-go();
+
+if(process.argv[2] && process.argv[2]=='tail') tail();
+else go();
 
 /*
   /usr/bin/mysqld, Version: 10.1.23-MariaDB (MariaDB Server). started with:
