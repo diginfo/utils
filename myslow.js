@@ -73,12 +73,13 @@ function loctime(x){
   return x;
 }
 
-function parse(last){
+function parse(last,end){
   var path = "/var/log/mysql/mariadb-slow.log";
   var rows=[], data= {}, row, idx=0;
-  //last = last || new Date(json.last);
   var unique = true;
-  fs.readFileSync(path,'utf-8').split(/\n/).map(function(lin){
+  var llines = fs.readFileSync(path,'utf-8').split(/\n/);
+  var len = llines.length;
+  llines.map(function(lin,idx){
     if(!lin) return;
     lin = lin.trim();
     
@@ -107,6 +108,10 @@ function parse(last){
         var date = new Date(ds);
         
         // don't repeat-process the same data
+
+        //cl(unique && end && idx != len-8); //515/516
+        //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
+
         if(unique && date <= last) row = null;
         else row = {Query:[],Time: date};
       }
@@ -137,13 +142,13 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',16],['DB',8],['SECS',8],['LOCK',8], ['ROWS-EX',8],['QRY',50]];
+  var def = [['STAMP',16],['DB',8],['SECS',8],['LOCK',8], ['ROWS-EX',8],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
   var last = new Date();
   setInterval(function(){
-    var rows = parse(last).rows;
+    var rows = parse(last,true).rows;
     rows.map(function(row){
       dorow(def,[sdate(row.Time),row.Schema,row.Query_time.toFixed(2),row.Lock_time.toFixed(2),row.Rows_examined,row.Key]);
       last = row.Time; 
