@@ -144,7 +144,7 @@ function tail(){
   cl();
   dohead(def);
   
-  var last = new Date();
+  var last = new Date('2018-03-29 20:24:00');
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
