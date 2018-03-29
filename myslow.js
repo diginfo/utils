@@ -163,9 +163,9 @@ function tail(){
       dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Rows_sent,row.Key]);
       if(row.Time) {
         
-        var nd = new Date(row.Time);
-        last = new Date(nd.getTime() - 10000);
-        //last = new Date(row.Time);
+        //var nd = new Date(row.Time);
+        //last = new Date(nd.getTime() - 10000);
+        last = new Date(row.Time);
       } 
     })
   },5000)
