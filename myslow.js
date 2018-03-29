@@ -138,6 +138,7 @@ function parse(last){
 
 function tail(){
   var def = [['STAMP',16],['DB',8],['SECS',8],['LOCK',8], ['ROWS-EX',8],['QRY',50]];
+  cl();
   dohead(def);
   
   var last = new Date();
