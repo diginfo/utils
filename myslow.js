@@ -74,28 +74,36 @@ function loctime(x){
 }
 
 function parse(last){
-  
+/*
+  # Time: 180326  8:15:11
+  # User@Host: root[root] @ localhost [127.0.0.1]
+  # Thread_id: 44  Schema: WLHTEST  QC_hit: No
+  # Query_time: 1382.585184  Lock_time: 0.000526  Rows_sent: 66413  Rows_examined: 132436
+  # Rows_affected: 0
+  use WLHTEST;
+  SET timestamp=1522023311;
+  select * from JOB_OPN;
+*/
+
   //cl(last);
   var path = "/var/log/mysql/mariadb-slow.log";
   var rows=[], data= {}, row, idx=0;
   var unique = true;
-  var llines = fs.readFileSync(path,'utf-8').split(/\n/);
-  llines.push('# Time: 000000  0:00:00\n');
-  var len = llines.length;
-  llines.map(function(lin,idx){
-    if(!lin) return;
-    lin = lin.trim();
+  var logs = fs.readFileSync(path,'utf-8').split(/\n/);
+  logs.push('# Time: 000000  0:00:00\n'); // Dummy Row.
+  
+  logs.map(function(line,idx){
+    if(!line) return;
+    line = line.trim();
     
-    if(lin.indexOf('#')==0){
-      line=lin.replace('# ','');
+    if(line.indexOf('#')==0){
+      line=line.replace('# ','');
       
-      // query strings
+      // Line #1
       if(line.indexOf('Time:')==0) {
         if(row) {
           
-          // new log.
-          //if(row.Rows_affected) rows.push(row);
-          
+          // Query strings
           row.Key = row.Query.join('')
             .replace(/use OMS[^;]+/g,'OMS??')
             .replace(/OMS[^;]+;/g,'')
@@ -109,30 +117,24 @@ function parse(last){
           rows.push(row);
         }
         
-        // query time
-        //var qt = line.replace('Time: ','').replace('  ',' ').split(' ') // # Time: 180328  9:00:54
-        //var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
+        // Query time
         var ts=line.slice(6);
         if(line.indexOf('000000')==0) return;
         var date = new Date([20+ts.slice(0,2),ts.slice(2,4),ts.slice(4,6)].join('/')+ts.slice(6))
         
-        
-        // 8 minute date hack
-        //var nd = new Date(ds);
-        //var date = new Date(nd.getTime() + 1*60000);
-        
-        //cl(unique && end && idx != len-8); //515/516
-        //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
         // don't repeat-process the same data
         if(unique && date <= last) row = null;
         else row = {Query:[],Time: date};
-      } // query-strings
+      }
       
+      // Line #3
       if(row && line.indexOf('Thread_id:')==0) {
         var bits = line.replace(/  /g,' ').split(' ');
         row.Schema = bits[3];
+        row.QC_hit = bits[5];
       }
       
+      // Line #4
       if(row && line.indexOf('Query_time:')==0) {
         var bits = line.split(/  /);
         bits.map(function(col){
@@ -140,16 +142,15 @@ function parse(last){
           row[bobs[0].trim()]=bobs[1].trim();
         })
       }
+      
+      // Line #5
       if(row && line.indexOf('Rows_affected:')==0) row.Rows_affected = line.split(/ *: */)[1];
     }
     
     else {
       if(row && row.Rows_affected) row.Query.push(lin);
     }
-    //cl(row);
   })
-  
-  //if(row && row.Rows_affected) rows.push(row);
   
   return {data:data,rows:rows};
 }
