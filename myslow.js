@@ -113,7 +113,7 @@ function parse(last){
         // don't repeat-process the same data
         if(unique && date <= last) row = null;
         else {
-          if(row.Time) rows.push(row);
+          if(row && row.Time) rows.push(row);
           row = {Query:[],Time: date};
         }
       }
