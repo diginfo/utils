@@ -149,7 +149,7 @@ function tail(){
     var rows = parse(last,true).rows;
     rows.map(function(row){
       dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
-      last = row.Time; 
+      last = new Date(row.Time); 
     })
   },5000)
 }
