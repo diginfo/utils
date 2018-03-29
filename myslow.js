@@ -147,6 +147,8 @@ function parse(last){
     //cl(row);
   })
   
+  if(row && row.Rows_affected) rows.push(row);
+  
   return {data:data,rows:rows};
 }
 
