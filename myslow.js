@@ -43,11 +43,10 @@ function loctime(x){
   return x;
 }
 
-function go(){
+function parse(last){
   var path = "/var/log/mysql/mariadb-slow.log";
   var data = {}, row, idx=0;
-  var last = new Date(json.last);
-  //cl(last,loctime(last));
+  //last = last || new Date(json.last);
   var unique = true;
   fs.readFileSync(path,'utf-8').split(/\n/).map(function(lin){
     if(!lin) return;
@@ -101,6 +100,12 @@ function go(){
     }
     //cl(row);
   })
+}
+
+function go(){
+  
+  var last = new Date(json.last);
+  var data = parse(last);
   
   var odata = {
     

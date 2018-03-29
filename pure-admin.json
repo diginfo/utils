@@ -1,0 +1,8 @@
+{
+  "init_null": true,
+  "idx_WLH": "1",
+  "sites_WLH": "1",
+  "idx_PAC": "11",
+  "sites_PAC": "1",
+  "dbsql_PAC": "select * from excel where id = 'vwltsa^sa_sorder';"
+}
