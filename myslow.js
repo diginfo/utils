@@ -3,8 +3,6 @@
 var readline = require('readline');
 var fs = require('fs');
 var cl = console.log;
-var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
-
 
 /*
   
@@ -103,6 +101,8 @@ function parse(last){
 }
 
 function go(){
+  
+  var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
   
   var last = new Date(json.last);
   var data = parse(last);
