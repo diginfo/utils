@@ -80,6 +80,7 @@ function parse(last){
   var rows=[], data= {}, row, idx=0;
   var unique = true;
   var llines = fs.readFileSync(path,'utf-8').split(/\n/);
+  llines.push('# Time: 000000  0:00:00\n');
   var len = llines.length;
   llines.map(function(lin,idx){
     if(!lin) return;
@@ -112,6 +113,7 @@ function parse(last){
         //var qt = line.replace('Time: ','').replace('  ',' ').split(' ') // # Time: 180328  9:00:54
         //var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
         var ts=line.slice(6);
+        if(line.indexOf('000000')==0) return;
         var date = new Date([20+ts.slice(0,2),ts.slice(2,4),ts.slice(4,6)].join('/')+ts.slice(6))
         
         
@@ -147,7 +149,7 @@ function parse(last){
     //cl(row);
   })
   
-  if(row && row.Rows_affected) rows.push(row);
+  //if(row && row.Rows_affected) rows.push(row);
   
   return {data:data,rows:rows};
 }
