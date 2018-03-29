@@ -152,7 +152,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',16],['DB',8],['SECS',9],['LOCK',9], ['ROWS-EX',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',10],['DB',6],['SECS',9],['LOCK',9], ['ROWS-EX',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -163,7 +163,7 @@ function tail(){
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
-      dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
+      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
       if(row.Time) last = new Date(row.Time); 
     })
   },5000)
