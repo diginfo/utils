@@ -114,7 +114,7 @@ function parse(last){
         
         // 8 minute date hack
         var nd = new Date(ds);
-        var date = new Date(nd.getTime() + 8*60000);
+        var date = new Date(nd.getTime() + 5.5*60000);
         
         //cl(unique && end && idx != len-8); //515/516
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
