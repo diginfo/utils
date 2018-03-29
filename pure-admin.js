@@ -2,7 +2,7 @@
 
 global.$ = {
   __pm2   : '/usr/share/nodejs/pm2/',
-  __his   : __dirname+'/pahis.json.off',
+  __his   : __dirname+'/pure-admin.json',
   his     : {},
   uid     : null,
   rowtot  : 0,
