@@ -122,7 +122,7 @@ function parse(last){
         //cl(unique && end && idx != len-8); //515/516
         //if((unique && date <= last) || (unique && end && idx != len-8)) row = null;
         // don't repeat-process the same data
-        if(unique && date < last) row = null;
+        if(unique && date <= last) row = null;
         else row = {Query:[],Time: date};
       } // query-strings
       
