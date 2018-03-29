@@ -259,6 +259,7 @@ function usrcols(site,res,next){
     if(row.last=='1') row.last = '-';
     if($.array.indexOf(row.uid)>-1) row.uid+='*';
     else $.array.push(row.uid);
+    row.last = row.last.replace(/\^/g,'->');
     dorow(cols,[site.name.split('.')[0].toUpperCase(),row.uid,row.ip,sdate(row.login),sdate(row.maxage)+' '+row.expires,row.last],sty);  
   })
   if(res.ofc.rows.length > 0) cl();
