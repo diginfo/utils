@@ -416,7 +416,7 @@ function utils(site){
         var msg = 'Dear $userid;\n\nCan you please log out for a few minutes so we can apply some updates.\n\nThank You.'
         logins(site,function(log){
           var uids=[$.uid];log.uids.map(function(e){uids.push(e[0])}); //['PAC',30]
-          qp.push('userid='+uids.join(','),'msg='+msg);
+          qp.push('userid='+uids.join('^'),'msg='+msg);
           cl(strpad(site.name.split('.')[0]+' sending to: ',20)+uids.join(','));
           cl();
           go(qp);
@@ -433,8 +433,8 @@ function utils(site){
           var uids=[];log.uids.map(function(e){
             if(e[1]<th) uids.push(e[0]);
           });
-          qp.push('userids='+uids.join('^'));
-          cl('Logging Out Idle Users (<'+th+' mins): '+uids.join(','));
+          qp.push('userids='+uids.join(','));
+          cl('Logging Out Idle Users (<'+th+' mins): '+uids.join('|'));
           cl();
           go(qp);
         });         
