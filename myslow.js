@@ -109,8 +109,11 @@ function parse(last){
         }
         
         // query time
-        var qt = line.replace('Time: ','').replace('  ',' ').split(' ') // # Time: 180328  9:00:54
-        var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
+        //var qt = line.replace('Time: ','').replace('  ',' ').split(' ') // # Time: 180328  9:00:54
+        //var ds = ['20'+qt[0].slice(0,2),qt[0].slice(2,4),qt[0].slice(4,6)].join('-')+' '+qt[1]; 
+        var ts=line.slice(6);
+        var date = new Date([20+ts.slice(0,2),ts.slice(2,4),ts.slice(4,6)].join('/')+ts.slice(6))
+        
         
         // 8 minute date hack
         var nd = new Date(ds);
@@ -149,7 +152,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',16],['DB',8],['SECS',8],['LOCK',8], ['ROWS-EX',8],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',16],['DB',8],['SECS',9],['LOCK',9], ['ROWS-EX',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
