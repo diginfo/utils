@@ -74,16 +74,17 @@ function loctime(x){
 }
 
 function parse(last){
-/*
-  # Time: 180326  8:15:11
-  # User@Host: root[root] @ localhost [127.0.0.1]
-  # Thread_id: 44  Schema: WLHTEST  QC_hit: No
-  # Query_time: 1382.585184  Lock_time: 0.000526  Rows_sent: 66413  Rows_examined: 132436
-  # Rows_affected: 0
-  use WLHTEST;
-  SET timestamp=1522023311;
-  select * from JOB_OPN;
-*/
+  
+  /*
+    # Time: 180326  8:15:11
+    # User@Host: root[root] @ localhost [127.0.0.1]
+    # Thread_id: 44  Schema: WLHTEST  QC_hit: No
+    # Query_time: 1382.585184  Lock_time: 0.000526  Rows_sent: 66413  Rows_examined: 132436
+    # Rows_affected: 0
+    use WLHTEST;
+    SET timestamp=1522023311;
+    select * from JOB_OPN;
+  */
 
   //cl(last);
   var path = "/var/log/mysql/mariadb-slow.log";
@@ -148,7 +149,7 @@ function parse(last){
     }
     
     else {
-      if(row && row.Rows_affected) row.Query.push(lin);
+      if(row && row.Rows_affected) row.Query.push(line);
     }
   })
   
@@ -157,7 +158,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',6],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',7],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -167,9 +168,6 @@ function tail(){
     rows.map(function(row){
       dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Rows_sent,row.Key]);
       if(row.Time) {
-        
-        //var nd = new Date(row.Time);
-        //last = new Date(nd.getTime() - 10000);
         last = new Date(row.Time);
       } 
     })
