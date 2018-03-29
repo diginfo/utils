@@ -14,6 +14,37 @@ var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
   
 */
 
+// var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
+function dohead(def){var tit=[],ul=[];def.map(function(e){
+  tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
+  process.stdout.write(style(tit.join(' '),'fg_blu')+"\n");
+  process.stdout.write(ul.join(' ')+"\n");
+}
+
+function dorow(def,row,sty){var r=[];row.map(function(col,idx){
+  r.push(strpad(col,def[idx][1]))});
+  if(sty) process.stdout.write(style(r.join(' '),sty)+"\n");
+  else process.stdout.write(r.join(' ')+"\n");
+}
+
+function sdate(date){
+  if(!date) return '';
+  var d = new Date(date);
+  var sd = [d.getYear()-100,intpad(d.getMonth()+1,2),intpad(d.getDate(),2)].join('');
+  sd+=' '+[intpad(d.getHours(),2),intpad(d.getMinutes(),2),intpad(d.getSeconds(),2)].join(':');
+  return sd; 
+}
+
+function intpad(n){if(n<10) return "0"+n; return n.toString()}
+function strpad(str,len,chr){if(str===null||str===undefined) str='';str = str.toString();chr = chr || ' ';if(str.length > len) return str.substr(0,len-3)+'...';return str += new Array(len-str.length+1).join(chr);}
+
+function style(str,sty,noclr){
+  var cols={res: "\x1b[0m",bright : "\x1b[1m",dim : "\x1b[2m",ul : "\x1b[4m",blink : "\x1b[5m",reverse : "\x1b[7m",hide : "\x1b[8m",fg_blk : "\x1b[30m",fg_red : "\x1b[31m",fg_grn : "\x1b[32m",fg_yel : "\x1b[33m",fg_blu : "\x1b[34m",fg_pur : "\x1b[35m",fg_cyn : "\x1b[36m",fg_wht : "\x1b[37m",bg_blk : "\x1b[40m",bg_red : "\x1b[41m",bg_grn : "\x1b[42m",bg_yel : "\x1b[43m",bg_blu : "\x1b[44m",bg_pur : "\x1b[45m",bg_cyn : "\x1b[46m",bg_wht : "\x1b[47m"};
+  str = cols[sty]+str;
+  if(!noclr) str+=cols['res'];
+  return str;
+}
+
 send = function(sub,html, cb) {
   var nodemailer = require('nodemailer');
   var transport = nodemailer.createTransport('SMTP',{
@@ -106,13 +137,15 @@ function parse(last){
 
 
 function tail(){
+  var def = [['STAMP',16],['DB',8],['SECS',8],['LOCK',8], ['ROWS-EX',8],['QRY',50]];
+  dohead(def);
+  
   var last = new Date(json.last);
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
-      cl(row);
-      last = row.Time;
-      cl('LAST',last)  
+      dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
+      last = row.Time; 
     })
   },5000)
 }
