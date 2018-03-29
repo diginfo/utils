@@ -152,19 +152,21 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DB',6],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',6],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
   var last = new Date();
-  //var last = new Date(json.last);
-  //cl(json.last,last)
-  
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
       dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Rows_sent,row.Key]);
-      if(row.Time) last = new Date(row.Time); 
+      if(row.Time) {
+        
+        var nd = new Date(row.Time);
+        last = new Date(nd.getTime() - 10000);
+        //last = new Date(row.Time);
+      } 
     })
   },5000)
 }
