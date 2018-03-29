@@ -41,8 +41,17 @@ function strpad(str,len,chr){if(str===null||str===undefined) str='';str = str.to
 function keysort(array, key) {return array.sort(function(a, b) {var x = a[key]; var y = b[key];return ((x < y) ? -1 : ((x > y) ? 1 : 0));});}
 
 // var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
-function dohead(def){var tit=[],ul=[];def.map(function(e){tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});cl(tit.join(' '));cl(ul.join(' '))}
-function dorow(def,row){var r=[];row.map(function(col,idx){r.push(strpad(col,def[idx][1]))});cl(r.join(' '))}
+function dohead(def){var tit=[],ul=[];def.map(function(e){
+  tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
+  process.stdout.write(style(tit.join(' '),'fg_blu')+"\n");
+  process.stdout.write(ul.join(' ')+"\n");
+}
+
+function dorow(def,row,sty){var r=[];row.map(function(col,idx){
+  r.push(strpad(col,def[idx][1]))});
+  if(sty) process.stdout.write(style(r.join(' '),sty)+"\n");
+  else process.stdout.write(r.join(' ')+"\n");
+}
 
 function adddir(file) {var dir = $.__run+file.split('/').slice(0,-1).join('/');try {fs.statSync(dir)} catch(e) {fs.mkdirSync(dir)}}
 function csv(str){return str.split(/[ ,]+/).filter(Boolean);}
@@ -240,13 +249,17 @@ function usrcols(site,res,next){
   if(!$.colhead) {cl(); dohead(cols);$.colhead=true;}
   res.ofc.rows.map(function(row){
     $.rowtot ++;
+    var sty;
     row.expires = ((new Date(row.maxage) - new Date().getTime())/60000).toFixed(1);
     //if($.uid = 'xPAC' && row.expires < 10) var expires = style(row.expires,'fg_red'); else var expires = row.expires;
-    if(row.expires < 20) row.expires += '*';
+    if(row.expires < 20) {
+      row.expires += '*';
+      sty = 'fg_red';
+    }
     if(row.last=='1') row.last = '-';
     if($.array.indexOf(row.uid)>-1) row.uid+='*';
     else $.array.push(row.uid);
-    dorow(cols,[site.name.split('.')[0].toUpperCase(),row.uid,row.ip,sdate(row.login),sdate(row.maxage)+' '+row.expires,row.last]);  
+    dorow(cols,[site.name.split('.')[0].toUpperCase(),row.uid,row.ip,sdate(row.login),sdate(row.maxage)+' '+row.expires,row.last],sty);  
   })
   if(res.ofc.rows.length > 0) cl();
   next();
