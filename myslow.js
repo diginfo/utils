@@ -140,7 +140,7 @@ function parse(last){
         var bits = line.split(/  /);
         bits.map(function(col){
           var bobs = col.trim().split(/ *: */);
-          row[bobs[0].trim()]=bobs[1].trim();
+          row[bobs[0].trim()]=parseFloat(bobs[1].trim());
         })
       }
       
@@ -158,7 +158,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',7],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',8],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -166,7 +166,8 @@ function tail(){
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
-      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Rows_sent,row.Key]);
+      var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
+      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time.toFixed(4),row.Lock_time.toFixed(4),row.Rows_examined,row.Rows_sent,row.Key],sty);
       if(row.Time) {
         last = new Date(row.Time);
       } 
