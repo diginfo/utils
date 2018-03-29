@@ -75,7 +75,7 @@ function loctime(x){
 
 function parse(last){
   
-  cl(last);
+  //cl(last);
   var path = "/var/log/mysql/mariadb-slow.log";
   var rows=[], data= {}, row, idx=0;
   var unique = true;
