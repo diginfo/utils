@@ -73,7 +73,7 @@ function loctime(x){
   return x;
 }
 
-function parse(last,end){
+function parse(last){
   var path = "/var/log/mysql/mariadb-slow.log";
   var rows=[], data= {}, row, idx=0;
   var unique = true;
@@ -144,12 +144,16 @@ function tail(){
   cl();
   dohead(def);
   
-  var last = new Date('2018-03-29 20:24:00');
+  var last = new Date();
+  //var last = new Date(json.last);
+  //cl(json.last,last)
+  
   setInterval(function(){
     var rows = parse(last).rows;
+    cl(rows);
     rows.map(function(row){
       dorow(def,[sdate(row.Time),row.Schema,row.Query_time,row.Lock_time,row.Rows_examined,row.Key]);
-      //last = new Date(row.Time); 
+      last = new Date(row.Time); 
     })
   },5000)
 }
@@ -158,8 +162,6 @@ function go(){
 
   var last = new Date(json.last);
   var data = parse(last).data;
-  
-  
   
   var odata = {
     
