@@ -417,7 +417,7 @@ function utils(site){
       qp:['_func=get','_sqlid=admin^logins'],
       post:usrcols,
       done:function(site,sel){
-        cl($.rowtot+' users logged in.');  
+        cl($.rowtot+' users logged in.','Select "Logout Idle Users" to logout idle (red) users.');  
       }
     },
     
