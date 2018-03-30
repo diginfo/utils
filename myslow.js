@@ -17,6 +17,7 @@ var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
 // var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
 function dohead(def){var tit=[],ul=[];def.map(function(e){
   tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
+  process.stdout.write(ul.join(' ')+"\n");
   process.stdout.write(style(tit.join(' '),'fg_blu')+"\n");
   process.stdout.write(ul.join(' ')+"\n");
 }
@@ -132,7 +133,7 @@ function parse(last){
       if(row && line.indexOf('Thread_id:')==0) {
         var bits = line.replace(/  /g,' ').split(' ');
         row.Schema = bits[3];
-        row.QC_hit = bits[5];
+        row.QC_hit = bits[5][0];
       }
       
       // Line #4
@@ -158,7 +159,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',8],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['ROWS-SENT',9],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',8],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['SENT',5],['QC',4],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -167,7 +168,7 @@ function tail(){
     var rows = parse(last).rows;
     rows.map(function(row){
       var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
-      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time.toFixed(4),row.Lock_time.toFixed(4),row.Rows_examined,row.Rows_sent,row.Key],sty);
+      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time.toFixed(4),row.Lock_time.toFixed(4),row.Rows_examined,row.Rows_sent,row.QC_hit,row.Key],sty);
       if(row.Time) {
         last = new Date(row.Time);
       } 

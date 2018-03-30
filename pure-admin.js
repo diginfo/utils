@@ -43,6 +43,7 @@ function keysort(array, key) {return array.sort(function(a, b) {var x = a[key]; 
 // var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
 function dohead(def){var tit=[],ul=[];def.map(function(e){
   tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
+  process.stdout.write(ul.join(' ')+"\n");
   process.stdout.write(style(tit.join(' '),'fg_blu')+"\n");
   process.stdout.write(ul.join(' ')+"\n");
 }
