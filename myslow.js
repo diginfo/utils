@@ -167,7 +167,7 @@ function tail(){
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
-      if(count % 35 ==0) dohead(def);
+      if(count > 0 && count % 35 ==0) dohead(def);
       var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
       dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time.toFixed(4),row.Lock_time.toFixed(4),row.Rows_examined,row.Rows_sent,row.QC_hit,row.Key],sty);
       if(row.Time) {
