@@ -4,7 +4,8 @@ var readline = require('readline');
 var fs = require('fs');
 var cl = console.log;
 var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
-
+var uid = process.env.UID3.toUpperCase();
+//cl(uid);
 /*
   
 ## SLOWLOGS
@@ -159,7 +160,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',6],['RUN     :HR',12],['LOCKED',7], ['EXAMIN',7],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',6],['RUNSEC   :HR',12],['LOCKED',7], ['EXAMIN',7],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -177,7 +178,7 @@ function tail(){
         var runhr = runmin / 60;
         qt_tot += row.Query_time;
         qt_hr = (qt_tot/runhr);
-        
+        if(uid=='PAC') cl(first,last,runsec,runmin,runhr,qt_tot,qt_hr);
         var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
         
         dorow(def,[
