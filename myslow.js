@@ -159,19 +159,38 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',8],['RUN-SEC',9],['LOCK-SEC',9], ['EXAMINED',9],['SENT',5],['QC',4],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',6],['RUN   :HR',9],['LOCKED',7], ['EXAMIN',7],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
-  var count=0;last = new Date();
+  var qt_tot=0,count=0,first, last=new Date();
   setInterval(function(){
     var rows = parse(last).rows;
     rows.map(function(row){
       if(count > 0 && count % 35 ==0) dohead(def);
-      var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
-      dorow(def,[sdate(row.Time).split(' ')[1],row.Schema,row.Query_time.toFixed(4),row.Lock_time.toFixed(4),row.Rows_examined,row.Rows_sent,row.QC_hit,row.Key],sty);
       if(row.Time) {
-        last = new Date(row.Time);
+        var ts = new Date(row.Time) 
+        if(!first) first = ts;
+        last = ts;
+        var runsec = (last.getTime()-first.getTime())/1000;
+        var runmin = runsec / 60;
+        var runhr = runmin / 60;
+        qt_tot += row.Query_time;
+        qt_hr = (qt_tot/runhr).toFixed(2);
+        
+        var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
+        
+        dorow(def,[
+          sdate(row.Time).split(' ')[1],
+          row.Schema,
+          row.Query_time.toFixed(4)+' :'+qt_hr,
+          row.Lock_time.toFixed(4),
+          row.Rows_examined,
+          row.Rows_sent,
+          row.QC_hit,
+          row.Key
+        ],sty);
+
       }
       count++
     })
