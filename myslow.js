@@ -3,7 +3,15 @@
 var readline = require('readline');
 var fs = require('fs');
 var cl = console.log;
-var json = JSON.parse(fs.readFileSync(__dirname+'/myslow.json','utf-8'));
+var jpath = __dirname+'/myslow.json';
+
+try {
+  var json = JSON.parse(fs.readFileSync(jpath,'utf-8'));
+} catch (err){
+  var json = {last:0,data:[]};
+  fs.writeFileSync(jpath,JSON.stringify(json),'utf-8'));    
+}
+
 var uid = process.env.UID3.toUpperCase();
 //cl(uid);
 /*
