@@ -159,7 +159,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',6],['RUN   :HR',9],['LOCKED',7], ['EXAMIN',7],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',6],['RUN     :HR',12],['LOCKED',7], ['EXAMIN',7],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -176,14 +176,14 @@ function tail(){
         var runmin = runsec / 60;
         var runhr = runmin / 60;
         qt_tot += row.Query_time;
-        qt_hr = (qt_tot/runhr).toFixed(2);
+        qt_hr = (qt_tot/runhr);
         
         var sty; if(parseInt(row.Query_time)>2) sty = 'fg_red';
         
         dorow(def,[
           sdate(row.Time).split(' ')[1],
           row.Schema,
-          row.Query_time.toFixed(4)+' :'+qt_hr,
+          row.Query_time.toFixed(2)+' :'+qt_hr.toFixed(2),
           row.Lock_time.toFixed(4),
           row.Rows_examined,
           row.Rows_sent,
