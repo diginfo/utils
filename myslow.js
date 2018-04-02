@@ -168,7 +168,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',7],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
+  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
   cl();
   dohead(def);
   
