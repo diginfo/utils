@@ -194,7 +194,7 @@ function tail(){
         
         if(uid=='PAC') {
           //cl(first,last,runsec,runmin,runhr,qt_tot,qt_hr);
-          cl((parseInt(row.Query_time));
+          cl(parseInt(row.Query_time));
         }
         
         dorow(def,[
