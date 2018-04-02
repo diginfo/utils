@@ -166,9 +166,16 @@ function parse(last){
   return {data:data,rows:rows};
 }
 
+function begend(str,len){
+  var x = (len/2)-3 
+  if(str < len) return str;
+  else {
+    return str.substr(0,x)+' ... '+str.substr(str.length-(x));
+  }
+}
 
 function tail(){
-  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
+  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINE',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
   cl();
   dohead(def);
   
@@ -207,7 +214,7 @@ function tail(){
           row.Rows_examined,
           row.Rows_sent,
           row.QC_hit,
-          row.Key
+          begend(row.Key,55)
         ],sty);
 
       }
