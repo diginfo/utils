@@ -168,7 +168,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',6],['SECS',6],['SEC/HR',6],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',7],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
   cl();
   dohead(def);
   
@@ -200,7 +200,7 @@ function tail(){
         
         dorow(def,[
           sdate(row.Time).split(' ')[1],
-          row.Schema,
+          row.Schema.replace('OMS',''),
           row.Query_time.toFixed(2),
           qt_hr,
           row.Lock_time.toFixed(4),
