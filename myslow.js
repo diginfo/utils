@@ -190,11 +190,11 @@ function tail(){
         else qt_hr = (qt_tot/runhr).toFixed(2);
         
         
-        var sty; if(parseInt(row.Query_time)>1.5) sty = 'fg_red';
+        var sty; if(parseFloat(row.Query_time)>1.5) sty = 'fg_red';
         
         if(uid=='PAC') {
           //cl(first,last,runsec,runmin,runhr,qt_tot,qt_hr);
-          cl(parseInt(row.Query_time));
+          //cl(parseInt(row.Query_time));
         }
         
         dorow(def,[
