@@ -60,7 +60,7 @@ function dofoot(def,msg){
   var tit=[],ul=[];
   def.map(function(e){tit.push(strpad(e[0],e[1]));ul.push(strpad('=',e[1],'='))});
   process.stdout.write(ul.join(' ')+"\n");
-  if(msg) process.stdout.write(style(msg,'fg_blue')+"\n\n");
+  if(msg) process.stdout.write(style(msg,'fg_blu')+"\n\n");
 }
 
 function adddir(file) {var dir = $.__run+file.split('/').slice(0,-1).join('/');try {fs.statSync(dir)} catch(e) {fs.mkdirSync(dir)}}
@@ -255,7 +255,8 @@ function devcols(site,res,next){
 }
 
 function usrcols(site,res,next){
-  var cols = [['SITE ID',8],['USER ID',15],['IP ADDRESS',15],['LOGIN TIME',16],['EXPIRES',22],['PATH',25]] 
+  var cols = [['SITE ID',8],['USER ID',15],['IP ADDRESS',15],['LOGIN TIME',16],['EXPIRES',22],['PATH',25]];
+  $.ucols = cols; 
   if(!$.colhead) {cl(); dohead(cols);$.colhead=true;}
   res.ofc.rows.map(function(row){
     $.rowtot ++;
@@ -427,7 +428,7 @@ function utils(site){
       post:usrcols,
       done:function(site,sel){
         var msg = $.rowtot+' users logged in.'+' Select "Logout Idle Users" to logout idle (red) users.';
-        process.stdout.write(style(msg,'fg_red')+"\n\n");
+        dofoot($.ucols,msg);
       }
     },
     
