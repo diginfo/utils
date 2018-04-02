@@ -9,7 +9,7 @@ try {
   var json = JSON.parse(fs.readFileSync(jpath,'utf-8'));
 } catch (err){
   var json = {last:0,data:[]};
-  fs.writeFileSync(jpath,JSON.stringify(json),'utf-8'));    
+  fs.writeFileSync(jpath,JSON.stringify(json),'utf-8');    
 }
 
 var uid = process.env.UID3.toUpperCase();
