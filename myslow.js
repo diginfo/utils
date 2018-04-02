@@ -168,7 +168,7 @@ function parse(last){
 
 
 function tail(){
-  var def = [['STAMP',9],['DBASE',6],['SECS',6],['SEC/HR',6],['LOCKED',7], ['EXAMIN',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
+  var def = [['STAMP',9],['DBASE',6],['SECS',6],['SEC/HR',6],['LOCKED',7], ['EXAMINED',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',50]];
   cl();
   dohead(def);
   
@@ -189,8 +189,9 @@ function tail(){
         if(first==last) var qt_hr = '-';
         else qt_hr = (qt_tot/runhr).toFixed(2);
         
-        
-        var sty; if(parseFloat(row.Query_time)>1.5) sty = 'fg_red';
+        var sty, qt = parseFloat(row.Query_time);
+        if(qt>2) sty = 'fg_red';
+        else if(qt>1.5) sty = 'fg_pur';
         
         if(uid=='PAC') {
           //cl(first,last,runsec,runmin,runhr,qt_tot,qt_hr);
