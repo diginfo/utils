@@ -31,27 +31,11 @@ function dohead(def){var tit=[],ul=[];def.map(function(e){
   process.stdout.write(ul.join(' ')+"\n");
 }
 
-function _dorow(def,row,sty){
-  var w=0,r=[[]];
-  row.map(function(col,idx){
-    // wrap a column
-    if(def[idx][2] && col.width > def[idx][1]){
-      
-    }
-    else r[0].push(strpad(col,def[idx][1]))
-    w+=def[idx][1]+1; // width
-  });
-  
-  if(sty) process.stdout.write(style(r[0].join(' '),sty)+"\n");
-  else process.stdout.write(r[0].join(' ')+"\n");
-}
-
 function dorow(def,row,sty){
   var twi=0,r=[[]];
   row.map(function(col,idx){
     // wrapped column
     var wid = def[idx][1];
-    // if(uid=='PAC') cl(def[idx],wid,col.length)
     if(def[idx][2] && col.length > wid){
       col.match(new RegExp('(.{1,'+wid+'})','g')).map(function(e,i){
         if(i==0) r[0].push(e);
@@ -67,6 +51,7 @@ function dorow(def,row,sty){
     if(sty) process.stdout.write(style(row.join(' '),sty)+"\n");
     else process.stdout.write(row.join(' ')+"\n");    
   })
+  return r.length;
 }
 
 function sdate(date){
@@ -237,7 +222,7 @@ function tail(){
           //cl(parseInt(row.Query_time));
         }
         
-        dorow(def,[
+        count+= dorow(def,[
           sdate(row.Time).split(' ')[1],
           row.Schema.replace('OMS',''),
           row.Query_time.toFixed(2),
@@ -250,7 +235,7 @@ function tail(){
         ],sty);
 
       }
-      count++
+      //count++
     })
   },5000)
 }
