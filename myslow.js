@@ -53,7 +53,7 @@ function dorow(def,row,sty){
     var wid = def[idx][1];
     // if(uid=='PAC') cl(def[idx],wid,col.length)
     if(def[idx][2] && col.length > wid){
-      str.match(new RegExp('(.{1,'+wid+'})','g')).map(function(e,i){
+      col.match(new RegExp('(.{1,'+wid+'})','g')).map(function(e,i){
         if(i==0) r[0].push(e);
         else(r.push([strpad('',twi)+e]));
       })
@@ -207,7 +207,7 @@ function begend(str,len){
 }
 
 function tail(){
-  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINE',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55,true]];
+  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMIN',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55,true]];
   cl();
   dohead(def);
   
