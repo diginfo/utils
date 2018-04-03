@@ -246,7 +246,7 @@ function tail(){
           row.Rows_examined,
           row.Rows_sent,
           row.QC_hit,
-          begend(row.Key,55)
+          row.Key
         ],sty);
 
       }
