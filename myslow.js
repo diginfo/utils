@@ -51,6 +51,7 @@ function dorow(def,row,sty){
   row.map(function(col,idx){
     // wrapped column
     var wid = def[idx][1];
+if($.uid=='PAC') cl(def[idx],wid,col.length)
     if(def[idx][2] && col.length > wid){
       str.match(new RegExp('(.{1,'+wid+'})','g')).map(function(e,i){
         if(i==0) r[0].push(e);
