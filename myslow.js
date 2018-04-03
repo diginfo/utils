@@ -31,10 +31,41 @@ function dohead(def){var tit=[],ul=[];def.map(function(e){
   process.stdout.write(ul.join(' ')+"\n");
 }
 
-function dorow(def,row,sty){var r=[];row.map(function(col,idx){
-  r.push(strpad(col,def[idx][1]))});
-  if(sty) process.stdout.write(style(r.join(' '),sty)+"\n");
-  else process.stdout.write(r.join(' ')+"\n");
+function dorow(def,row,sty){
+  var w=0,r=[[]];
+  row.map(function(col,idx){
+    // wrap a column
+    if(def[idx][2] && col.width > def[idx][1]){
+      
+    }
+    else r[0].push(strpad(col,def[idx][1]))
+    w+=def[idx][1]+1; // width
+  });
+  
+  if(sty) process.stdout.write(style(r[0].join(' '),sty)+"\n");
+  else process.stdout.write(r[0].join(' ')+"\n");
+}
+
+function dorow(def,row,sty){
+  var twi=0,r=[[]];
+  row.map(function(col,idx){
+    // wrapped column
+    var wid = def[idx][1];
+    if(def[idx][2] && col.length > wid){
+      str.match(new RegExp('(.{1,'+wid+'})','g')).map(function(e,i){
+        if(i==0) r[0].push(e);
+        else(r.push([strpad('',twi)+e]));
+      })
+    }
+    // un-wrapped column
+    else r[0].push(strpad(col,wid))
+    twi+=def[idx][1]+1; // width
+  });
+  
+  r.map(function(row){
+    if(sty) process.stdout.write(style(row.join(' '),sty)+"\n");
+    else process.stdout.write(row.join(' ')+"\n");    
+  })
 }
 
 function sdate(date){
