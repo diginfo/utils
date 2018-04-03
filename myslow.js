@@ -31,7 +31,7 @@ function dohead(def){var tit=[],ul=[];def.map(function(e){
   process.stdout.write(ul.join(' ')+"\n");
 }
 
-function dorow(def,row,sty){
+function _dorow(def,row,sty){
   var w=0,r=[[]];
   row.map(function(col,idx){
     // wrap a column
@@ -59,7 +59,7 @@ function dorow(def,row,sty){
     }
     // un-wrapped column
     else r[0].push(strpad(col,wid))
-    twi+=def[idx][1]+1; // width
+    twi+=wid+1; // width
   });
   
   r.map(function(row){
@@ -206,7 +206,7 @@ function begend(str,len){
 }
 
 function tail(){
-  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINE',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55]];
+  var def = [['STAMP',9],['DB',4],['SECS',6],['SEC/HR',7],['LOCKED',7], ['EXAMINE',8],['SENT',6],['QC',3],['SQL QUERY (PARSED)',55,true]];
   cl();
   dohead(def);
   
