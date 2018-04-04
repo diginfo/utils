@@ -83,7 +83,7 @@ send = function(sub,html, cb) {
 
   var mailOptions = {
     from: 'noreply@dis.com.sg',
-    to: 'pac@dis.com.sg',
+    to: 'purehelp@dis.com.sg',
     subject: sub || 'Slow Log Stats.',
     html: html
   };
