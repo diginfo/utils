@@ -1,0 +1,28 @@
+{
+
+  "$": {
+    "__pm2"     : "/usr/share/nodejs/pm2",
+    "__his"     : "./pure-admin.json",
+    "__data"    : "/usr/share/nodejs/sites",
+    "__tpl"     : "/usr/share/dev/nodejs/run/pure3/data/__template",
+    "__root"    : "/usr/share/dev/nodejs/run/pure3",
+    "__ngpath"  : "/etc/nginx/sites.d",
+    
+    "_dbhost"   : "127.0.0.1",
+    "dbhost"    : "192.168.139.253",
+    "his"       : {},
+    "uid"       : null,
+    "rowtot"    : 0,
+    "array"     : []
+  },
+
+  "init_null": true,
+  "idx_CLS": "12",
+  "sites_CLS": "3",
+  "dbsql_CLS": "update events set trigger_on='None';",
+  "idx_PAC": "1",
+  "sites_PAC": "2",
+  "dbsql_PAC": "select * from menu",
+  "idx_WLH": "13",
+  "sites_WLH": "2"
+}
