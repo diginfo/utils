@@ -17,4 +17,7 @@ grep -q -F "$LINE" $BASHDIS || echo "$LINE" >> $BASHDIS;
 LINE='alias myslow="/usr/share/nodejs/utils/myslow.js"';
 grep -q -F "$LINE" $BASHDIS || echo "$LINE" >> $BASHDIS;
 
+ECHO "## IMPORTANT - Please Edit All Paths ##"
+nano /usr/share/nodejs/utils/pure-admin.js
+
 source $BASHDIS;
