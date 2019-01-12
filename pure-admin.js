@@ -1,13 +1,6 @@
 #!/usr/bin/env node
 
-global.$ = {
-  __pm2   : '/usr/share/nodejs/pm2/',
-  __his   : __dirname+'/pure-admin.json',
-  his     : {},
-  uid     : null,
-  rowtot  : 0,
-  array   : [],
-}
+global.$ = require('./pure-admin.json').$;
 
 var readline = require('readline');
 var fs = require('fs');
@@ -16,7 +9,10 @@ var cl = console.log;
 var path = require('path');
 var sqlite3 = require('sqlite3');
 var mysql = require('mysql');
-var pm2 = require('/usr/share/nodejs/pm2/pm2-apps.js');
+
+
+var getall = require($.__pm2+'/pm2-apps.js').getall;
+var pm2 = require($.__pm2+'/node_modules/pm2');
 
 var his;
 try{$.his = JSON.parse(fs.readFileSync($.__his))} 
@@ -40,6 +36,12 @@ function objidx(ar,key,val){return ar.map(function(e){return e[key]}).indexOf(va
 function strpad(str,len,chr){if(str===null||str===undefined) str='';str = str.toString();chr = chr || ' ';if(str.length > len) return str.substr(0,len-3)+'...';return str += new Array(len-str.length+1).join(chr);}
 function keysort(array, key) {return array.sort(function(a, b) {var x = a[key]; var y = b[key];return ((x < y) ? -1 : ((x > y) ? 1 : 0));});}
 
+function obj2url(obj){
+  return Object.keys(obj).map(function(k) {
+    return encodeURIComponent(k) + "=" + encodeURIComponent(obj[k]);
+  }).join('&')
+}
+
 // var def = [['TIME',9],['SITE',8],['FRQ',3], ['UNITS',6],['EVENT ID',50]];
 function dohead(def){
   var tit=[],ul=[];
@@ -54,6 +56,13 @@ function dorow(def,row,sty){
   row.map(function(col,idx){r.push(strpad(col,def[idx][1]))});
   if(sty) process.stdout.write(style(r.join(' '),sty)+"\n");
   else process.stdout.write(r.join(' ')+"\n");
+}
+
+// common error handler.
+function error(res){
+  cl(res.msg);
+  pm2.disconnect();
+  process.exit();
 }
 
 function dofoot(def,msg){
@@ -97,10 +106,15 @@ function hislast(id){
   return ''; 
 }
 
-// backend HTTP Request.
+// backend HTTP Request
 function http(url,cb){
   var request = require('request');
-  request(url, function (err,res,body) {
+  request({
+    url: url,
+    headers: {
+    'User-Agent': 'local-request'
+    }
+  }, function (err,res,body) {
     if (!err && res.statusCode == 200) return cb(body);
     else return cb({error:true,msg:err})
   })
@@ -125,7 +139,7 @@ if(process.argv.length > 2){
     var cmd = process.argv[2];
     //var arg = process.argv.splice(3);
     var arg = process.argv[3];
-    module.exports[cmd](function(res){console.log(JSON.stringify(res,null,2))},arg);
+    module.exports[cmd](function(res){cl(JSON.stringify(res,null,2))},arg);
   });
 } else {
   cl('USAGE:','pureadmin');
@@ -178,26 +192,37 @@ function myquery(site,sql,cb){
 
 function getsite(cb,msg){
   msg = msg || 'Select Site ID';
-  var err=[],list=[],slist=[],sites = require($.__pm2+'pm2-apps.js',true).getall(true);
-  var idx=0;for(var site in sites){if(sites[site].appid=='puremfg') {
-    sites[site].idx = idx;
-    var len = slist.push(site);
-    list.push(len);
-    idx++;
+  var err=[],list=[],slist=[];
+  //$.allsites = require($.__pm2+'pm2-apps.js',true).getall(true);
+  $.allsites = getall(true);
+  var idx=0;
+  for(var site in $.allsites){
+    $.allsites[site].idx = idx;
+    if($.allsites[site].appid=='puremfg') {
+      var len = slist.push(site);
+      list.push(len);
+      idx++;
   }}
   const rl = getrl();  
-  cl();slist.map(function(e,i){cl(strpad(i+1+'.',3),e)});
+  cl(); slist.map(function(e,i){cl(strpad(i+1+'.',3),e)});
   rl.question('\n'+msg+': ',function(idx){
     hisput('sites',idx);
     rl.close();
     var sout = [];
-    lists(list,idx).map(function(idx){sout.push(sites[slist[idx-1]])});
+    lists(list,idx).map(function(idx){
+      sout.push($.allsites[slist[idx-1]])
+    });
     cb(sout);
   });
   rl.write(hislast('sites'));
 }
 
 /* ######################## */
+
+
+function mydump(user='ROOT',pwd,db,fn,cb){
+  exec(`/usr/bin/mysqldump --routines -u ${user} -p${pwd} ${db} | sed -e 's/DEFINER=[^ |\*]*//' > ${fn}`,cb)
+}
 
 function lists(list,idx){
   if(!idx || /q/i.test(idx)) return cb();
@@ -258,22 +283,24 @@ function usrcols(site,res,next){
   var cols = [['SITE ID',8],['USER ID',15],['IP ADDRESS',15],['LOGIN TIME',16],['EXPIRES',22],['PATH',25]];
   $.ucols = cols; 
   if(!$.colhead) {cl(); dohead(cols);$.colhead=true;}
-  res.ofc.rows.map(function(row){
-    $.rowtot ++;
-    var sty;
-    row.expires = ((new Date(row.maxage) - new Date().getTime())/60000).toFixed(1);
-    //if($.uid = 'xPAC' && row.expires < 10) var expires = style(row.expires,'fg_red'); else var expires = row.expires;
-    if(row.expires < 20) {
-      row.expires += '*';
-      sty = 'fg_red';
-    }
-    if(row.last=='1') row.last = '-';
-    if($.array.indexOf(row.uid)>-1) row.uid+='*';
-    else $.array.push(row.uid);
-    row.last = row.last.replace(/\^/g,' > ');
-    dorow(cols,[site.name.split('.')[0].toUpperCase(),row.uid,row.ip,sdate(row.login),sdate(row.maxage)+' '+row.expires,row.last],sty);  
-  })
-  if(res.ofc.rows.length > 0) cl();
+  if(res && res.ofc && res.ofc.rows) {
+      res.ofc.rows.map(function(row){
+      $.rowtot ++;
+      var sty;
+      row.expires = ((new Date(row.maxage) - new Date().getTime())/60000).toFixed(1);
+      //if($.uid = 'xPAC' && row.expires < 10) var expires = style(row.expires,'fg_red'); else var expires = row.expires;
+      if(row.expires < 20) {
+        row.expires += '*';
+        sty = 'fg_red';
+      }
+      if(row.last=='1') row.last = '-';
+      if($.array.indexOf(row.uid)>-1) row.uid+='*';
+      else $.array.push(row.uid);
+      row.last = row.last.replace(/\^/g,' > ');
+      dorow(cols,[site.name.split('.')[0].toUpperCase(),row.uid,row.ip,sdate(row.login),sdate(row.maxage)+' '+row.expires,row.last],sty);  
+    })
+    if(res.ofc.rows.length > 0) cl();
+  }
   next();
 }
 
@@ -419,9 +446,217 @@ function upfiles(site,sel,cb){
   })
 }
 
+// nginx configuration
+function ngt(pmt){
+return `server { 
+  listen 80; 
+  listen [::]:80; 
+  
+  listen 443 ssl http2; 
+  listen [::]:443 http2; 
+
+  server_name ${pmt.name}; 
+  root ${$.__root}/public; 
+
+  if ( $http_user_agent !~ 'pure-iotd' ) {
+    return 301 https://$host$request_uri;
+  }
+
+  location / { 
+    try_files $uri @backend; 
+  } 
+
+  location ~ .(?:ico|jpg|css|png|js|swf|woff|eot|svg|ttf|html|gif)$ { 
+    add_header Pragma "public"; 
+    add_header Cache-Control "public"; 
+    expires 30d; 
+  } 
+
+  location @backend {
+    proxy_pass http://localhost:${pmt.env.PORT}; 
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+    proxy_set_header Host $http_host; 
+    proxy_set_header X-Forwarded-Proto $scheme; 
+    proxy_buffering off; 
+  } 
+
+  location = /444-response {return 444;} 
+}`;
+}
+
 function utils(site){
   const rl = getrl();
   var opts = [    
+    
+    {
+      txt:'Add new Site', 
+      qp:[],
+      nosite:function(){
+        
+        // find existing max port
+        var maxport = 0;
+        getall().map(function(site){
+          if(site.appid=='puremfg' && site.env.PORT > maxport) maxport = parseInt(site.env.PORT);   
+        })
+        maxport += 10;
+
+        // PM2 Configuration
+        var pmt = {
+          "name": "",
+          "disabled": false,
+          "appid": "puremfg",
+          "script": "",
+          "log_date_format": "DD-MM HH:mm:ss",
+          "exec_mode": "fork",
+          
+          "env": {
+            "TZOSET": "",
+            "SITEID": "",
+            "GRPID": "",
+            "DATA": "",
+            "GRP_DATA": "",
+            "NODE_ENV": "production",
+            "PORT": 0,
+            "DBSA": {
+              "host": "",
+              "name": "",
+              "user": "root",
+              "pwd": "",
+              "engine": "MYSQL",
+              "pooling": true,
+              "connectionLimit": 0
+            }
+          }
+        };      
+
+        var qs = {
+          'pmt.name': {
+            txt: 'http host name',
+            post: function(item,val){
+              val = val.toUpperCase();
+            }
+          },
+          
+          'pmt.env.SITEID': {
+            txt: 'site ID'},
+          
+          'pmt.env.GRPID': {
+            txt: 'group ID',
+            pre: function(item,val){
+              item.def = pmt.env.SITEID  
+            }
+          },
+
+          'pmt.script': {
+            txt: 'Path to Engine',
+            def: `${$.__root}/pureapp.js`
+          },
+          
+          'pmt.env.DATA': {
+            txt: 'Site Data Path',
+            def: $.__data, 
+            pre: function(item,val){
+              item.def += '/' + qs['pmt.env.SITEID'].val+'/data';
+            }
+          },
+          
+          'pmt.env.GRP_DATA': {
+            txt: 'Group Data Path',
+            def: $.__data, 
+            pre: function(item,val){
+              item.def += '/' + qs['pmt.env.GRPID'].val+'/data';
+            }
+          },
+          
+          'pmt.env.PORT': {
+            txt: 'Node Port',
+            def: maxport.toString()
+          },
+          
+          'pmt.env.DBSA.host': {
+            txt: 'Database Host / IP',
+            def: $.dbhost
+          },
+
+          'pmt.env.DBSA.pwd': {
+            txt: 'MYSQL Root Password'
+          },
+          
+          'pmt.env.DBSA.name': {
+            txt: 'Database Name',
+            pre: function(item,val){
+              item.def = qs['pmt.env.SITEID'].val.toUpperCase()
+            }
+          },
+
+          'pmt.env.DBSA.connectionLimit': {
+            txt: 'Max Connections',
+            def: '5',
+            post: function(item,val){
+              val = parseInt(val);
+            }
+          },
+
+          'pmt.env.TZOSET': {
+            txt:  'Timezone Offset',
+            def:  '+8:00'
+          },
+          
+        }
+        
+        // loop through the questions.
+        var vars = Object.keys(qs);
+        const rl = getrl();
+        asy.eachSeries(vars,function(key,next){
+          var val,item = qs[key];
+          if(item.pre) item.pre(item,val);
+          
+          rl.question(`Enter ${strpad(item.txt,20)} >: `, function(val){
+            if(!val) error({error:true,msg:'value cannot be null'})
+            if(item.post) item.post(item,val);
+            qs[key].val = val;
+            eval(`${key}=val`);
+            next();
+               
+          });
+          if(item.def) rl.write(item.def);
+        },function(){
+          
+          // questions finished
+          cl('====');
+          rl.close();
+          
+          var sid = pmt.env.SITEID;
+          var path = `${$.__pm2}/json/${sid}.json`;
+        
+          // write the pm2 file
+          fs.writeFile(path,JSON.stringify({"apps":[pmt]},null,2),'utf-8',function(err){          
+            
+            // create folder structure.
+            cl(`Creating Default Folders ${pmt.env.DATA}`);
+            var cmd = `mkdir -p ${pmt.env.DATA}; cp -rp ${$.__tpl}/data/* ${pmt.env.DATA}/`; 
+            exec(cmd,function(res){
+              //ignore errors if folder already exists
+              
+              // Create nginx configuration.
+              var ngfn = `${$.__ngpath}/${pmt.name}.conf`;
+              cl(`Saving NGINX config ${ngfn}`);
+                fs.writeFile(ngfn,ngt(pmt),'utf-8',function(err){
+                  if(err) error(err);
+                  cl('@@@@@@@@@ DONE @@@@@@@@');
+                  cl(`Port Number is ${pmt.env.PORT}`);
+                  cl(`Please create database ${pmt.env.DBSA.name} before starting engine.`);
+                  cl(`Please reload nginx: service nginx reload`);
+                  cl(`To start engine:\n pm2 start ${path}`);
+                  cl('=======================');
+                })   
+                  
+            });         
+          });
+        });
+      },        
+    },
+
     {
       txt:'User Logins', 
       qp:['_func=get','_sqlid=admin^logins'],
@@ -539,7 +774,7 @@ function utils(site){
     },
 
     {
-      txt:'Database Clone', 
+      txt:'Data Clone', 
       site_prompt:'Select ONE CLONE-SOURCE Site',
       qp:[],
       post_site:function(site,sel,cb){
@@ -569,7 +804,107 @@ function utils(site){
       }
     },
 
-    {off:true,txt:'V3 Menu Convert', qp:[]},
+    {
+      txt:'Database Move', 
+      site_prompt:'Select ONE SOURCE Site',
+      qp:[],
+      post_site:function(site,sel,cb){
+        if($.sites.length >1) return cl('Cannot select multiple sites.')
+        const rl = getrl();
+        rl.question('\nTarget IP/Host: ', function(tgt){
+          
+          // get the vwlt site.
+          var pure = $.sites[0];
+          var sid = pure.env.SITEID;
+          
+          // check src/tgt (localhost)
+          var src = pure.env.DBSA.host; 
+          if(src==tgt){
+            rl.close();
+            cl('Source is same as target');
+            process.exit();
+          }
+          
+          var vwlt;
+          for(var s in $.allsites){
+            var site = $.allsites[s];
+            if(site.env.SITEID==sid && site.appid=='vwlt'){
+              vwlt = site;
+              break;      
+            }
+          }
+          
+          rl.question('\nMYSQL Root Password: ', function(pwd){
+               
+            var quest = `YES ${$.uid} is sure`;
+            rl.question('\nAre you sure ? ['+quest+'] : ', function(yn){
+              cl(`Deleting node processes: ${pure.name}, ${vwlt.name}`)
+              rl.close(); 
+              if(yn==quest) {
+                var db = pure.env.DBSA.name;
+                pm2.connect(function(err){
+                  if(err) error(err);
+                  
+                  // Stop Pure Site
+                  pm2.delete(pure.name,function(err){     
+                    if(err) error(err);
+                    
+                    // Stop VWLT site
+                    pm2.delete(vwlt.name,function(err){  
+                      if(err) error(err);
+                      
+                      // Dump Source Database
+                      cl(`Dumping ${db} database ...`);
+                      var dfn = `/tmp/${db}_MOVE.sql`; 
+                      mydump('root',pwd,db,dfn,function(res){
+                        if(res.error) error(res);
+
+                        // Drop & create database & load on tgt
+                        cl(`Creating new ${db} database on ${tgt}...`);
+                        var cmd = `/usr/bin/mysql -h ${tgt} -u root -p${pwd} -e "CREATE DATABASE ${db}; USE ${db}; SOURCE ${dfn}; COMMIT;"`;
+                        exec(cmd,function(res){
+                          if(res.error) error(res);
+                          
+                          // Edit pm2 file
+                          cl('Changing host in ${path}...')
+                          var path = `${$.__pm2}/json/${pure._filename}`; 
+                          var purejs = require(path);
+                          purejs.apps.map(function(app){
+                            app.env.DBSA.host = tgt;
+                            cl(app.env.DBSA);
+                          });
+                          
+                          // Save file with new host
+                          cl(`Saving new PM2 file ${path}...`);
+                          fs.writeFile(path,JSON.stringify(purejs,null,2),'utf-8',function(err){
+                            if(err) error(err);  
+                            
+                            // Start new process using new host.
+                            cl(`Starting new PM2 Processes ...`);
+                            pm2.start(path,function(err){
+                              if(err) error(err);
+                              
+                              // Delete dump file.
+                              cl(`Deleting dump file ${dfn}...`);
+                              exec(`rm-rf ${path}`,function(){
+                                cl('Database move DONE.')
+                                pm2.disconnect(); 
+                              });
+                            });
+                          });       
+                        });
+                      })
+                    })
+                  })
+                })
+                
+              }   //y/n
+            })    // sure
+          })      // root PWD
+        })        //Target IP
+        rl.write('192.168.139.253')
+      }
+    },
     
     {
       off:false,
@@ -615,6 +950,36 @@ function utils(site){
       }
     },
 
+
+    {
+      txt:'JSON API Request', 
+      qp:[],
+      post_site:function(site,sel,cb){
+        
+        const rl = getrl();
+        rl.question('\nEnter JSON Data: ', function(json){
+          var data;
+          try{
+            data = JSON.parse(json);
+            if(data._sqlid && data._sqlid.indexOf('^') < 0) return error({error:true,msg:`ERROR Bad sqlid: ${data._sqlid}`});
+            var url = obj2url(data);
+            cl('JSON Data is Valid.');
+            rl.question('\nProceed Now ? [YES/NO]: ', function(yn){
+              rl.close();
+              if(yn!=='YES') process.exit();
+              http(`http://localhost:${site.env.PORT}/?${url}`,function(res){
+                cl(res);  
+              })
+            });
+          }
+          catch(err){
+            error({error:true,msg:err})
+          }    
+        })
+      }
+    },
+
+
   ];
   cl();
   
@@ -628,6 +993,8 @@ function utils(site){
     hisput('idx',idx);
     var sel = opts[idx-1];    
     if($.uid != 'PAC' && sel.off) return cl('@@@', 'This function is under development','@@@');
+    if(sel.nosite) return sel.nosite();
+    
     
     getsite(function(sites){
       $.sites = sites;
@@ -686,4 +1053,3 @@ if($.uid){
     utils();
   });
 }
-
