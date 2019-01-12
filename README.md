@@ -8,3 +8,9 @@
   <li>npm install</li>
   <li>./config.sh</li>  
 </ol>
+<h2>Configure PURE Utils</h2>
+<ol>
+  <li>cd /usr/share/nodejs/utils</li>
+  <li>nano pure-admin.json</li>
+  <li>Edit all of the paths</li>
+</ol>
