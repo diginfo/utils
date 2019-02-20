@@ -449,18 +449,12 @@ function upfiles(site,sel,cb){
 // nginx configuration
 function ngt(pmt){
 return `server { 
-  listen 80; 
-  listen [::]:80; 
-  
   listen 443 ssl http2; 
   listen [::]:443 http2; 
-
+  #listen 80; 
+  #listen [::]:80; 
   server_name ${pmt.name}; 
   root ${$.__root}/public; 
-
-  if ( $http_user_agent !~ 'pure-iotd' ) {
-    return 301 https://$host$request_uri;
-  }
 
   location / { 
     try_files $uri @backend; 
@@ -658,7 +652,7 @@ function utils(site){
     },
 
     {
-      txt:'User Logins', 
+      txt:'User Logins',
       qp:['_func=get','_sqlid=admin^logins'],
       post:usrcols,
       done:function(site,sel){
@@ -825,7 +819,7 @@ function utils(site){
             process.exit();
           }
           
-          var vwlt;
+          var vwlt = {name:''};
           for(var s in $.allsites){
             var site = $.allsites[s];
             if(site.env.SITEID==sid && site.appid=='vwlt'){
@@ -851,7 +845,7 @@ function utils(site){
                     
                     // Stop VWLT site
                     pm2.delete(vwlt.name,function(err){  
-                      if(err) error(err);
+                      if(err) cl(err); // ignore if vwlt does not exist.
                       
                       // Dump Source Database
                       cl(`Dumping ${db} database ...`);
@@ -902,7 +896,7 @@ function utils(site){
             })    // sure
           })      // root PWD
         })        //Target IP
-        rl.write('192.168.139.253')
+        rl.write('puredb')
       }
     },
     
@@ -1002,7 +996,7 @@ function utils(site){
         asy.eachSeries(sites,function(site,next){
           
           function go(qp){
-            var url = "http://localhost:"+site.env.PORT+"/?"+qp.join('&');
+            var url = "http://localhost:"+site.env.PORT+"/?_appid=pure-admin&"+qp.join('&');
             //if($.uid=='PAC') cl('@@URL:',url);
             http(url,function(res){
               try {
